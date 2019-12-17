@@ -3,8 +3,7 @@ defmodule ShortyWeb.LinkView do
   alias ShortyWeb.LinkView
 
   def render("show.json", %{link: link}) do
-    %{shortcode: link.shortcode,
-      url: link.url}
+    %{shortcode: link.shortcode}
   end
 
   def render("stats.json", %{link: link}) do

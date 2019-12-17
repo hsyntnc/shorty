@@ -5,7 +5,11 @@ defmodule ShortyWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/api", ShortyWeb do
+  scope "/", ShortyWeb do
     pipe_through :api
+
+    post "/shorten", LinkController, :create
+    get "/:shortcode", LinkController, :show
+    get "/:shortcode/stats", LinkController, :stats
   end
 end

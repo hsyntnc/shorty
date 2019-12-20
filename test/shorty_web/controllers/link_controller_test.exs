@@ -4,18 +4,22 @@ defmodule ShortyWeb.LinkControllerTest do
   alias Shorty.Links
   alias Shorty.Links.Link
 
-  @create_attrs %{
-    shortcode: "some shortcode",
-    url: "some url"
+  @link_without_code %{
+    url: "https://www.impraise.com"
   }
-  @update_attrs %{
-    shortcode: "some updated shortcode",
-    url: "some updated url"
+
+  @valid_link_attrs %{
+    shortcode: "imprse",
+    url: "https://www.impraise.com"
   }
-  @invalid_attrs %{shortcode: nil, url: nil}
+
+  @invalid_link_attrs %{
+    shortcode: "an invalid shortcode",
+    url: "https://www.impraise.com"
+  }
 
   def fixture(:link) do
-    {:ok, link} = Links.create_link(@create_attrs)
+    {:ok, link} = Links.create_link(@valid_link_attrs)
     link
   end
 
@@ -23,65 +27,95 @@ defmodule ShortyWeb.LinkControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
-  describe "index" do
-    test "lists all links", %{conn: conn} do
-      conn = get(conn, Routes.link_path(conn, :index))
-      assert json_response(conn, 200)["data"] == []
+  describe "shortcode generation" do
+    test "create a shortcode with a valid code given", %{conn: conn} do
+      response =
+        conn
+        |> post("/shorten", @valid_link_attrs)
+        |> json_response(201)
+
+      expected = %{ "shortcode" => @valid_link_attrs[:shortcode] }
+
+      assert expected === response
+    end
+
+    test "create a shortcode without a shortcode", %{conn: conn} do
+      response =
+        conn
+        |> post("/shorten", @link_without_code)
+        |> json_response(201)
+    end
+
+    test "returns an error without a url", %{ conn: conn } do
+      response =
+        conn
+        |> post("/shorten", %{})
+        |> json_response(400)
+
+      assert response["errors"] != %{}
+    end
+
+    test "returns an error if given shortcode is not valid", %{conn: conn} do
+      response =
+        conn
+        |> post("/shorten", @invalid_link_attrs)
+        |> json_response(422)
+
+      assert response["errors"] != %{}
+    end
+
+    test "returns an error if given shortcode is already in use", %{conn: conn} do
+      response =
+        conn
+        |> post("/shorten", @valid_link_attrs)
     end
   end
 
-  describe "create link" do
-    test "renders link when data is valid", %{conn: conn} do
-      conn = post(conn, Routes.link_path(conn, :create), link: @create_attrs)
-      assert %{"id" => id} = json_response(conn, 201)["data"]
-
-      conn = get(conn, Routes.link_path(conn, :show, id))
-
-      assert %{
-               "id" => id,
-               "shortcode" => "some shortcode",
-               "url" => "some url"
-             } = json_response(conn, 200)["data"]
-    end
-
-    test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, Routes.link_path(conn, :create), link: @invalid_attrs)
-      assert json_response(conn, 422)["errors"] != %{}
-    end
-  end
-
-  describe "update link" do
+  describe "shortcode endpoint" do
     setup [:create_link]
 
-    test "renders link when data is valid", %{conn: conn, link: %Link{id: id} = link} do
-      conn = put(conn, Routes.link_path(conn, :update, link), link: @update_attrs)
-      assert %{"id" => ^id} = json_response(conn, 200)["data"]
+    test "returns 302 if shortcode was found", %{conn: conn, link: link} do
+      response =
+        conn
+        |> get("/#{link.shortcode}")
+        |> response(302)
 
-      conn = get(conn, Routes.link_path(conn, :show, id))
+      expected = ""
 
-      assert %{
-               "id" => id,
-               "shortcode" => "some updated shortcode",
-               "url" => "some updated url"
-             } = json_response(conn, 200)["data"]
+      assert response == expected
     end
 
-    test "renders errors when data is invalid", %{conn: conn, link: link} do
-      conn = put(conn, Routes.link_path(conn, :update, link), link: @invalid_attrs)
-      assert json_response(conn, 422)["errors"] != %{}
+    test "returns 404 if shortcode was not found", %{conn: conn} do
+      response =
+        conn
+        |> get("/an_invalid_shortcode")
+        |> json_response(404)
+
+      assert response["errors"] != %{}
     end
   end
 
-  describe "delete link" do
+  describe "shortcode stats" do
     setup [:create_link]
 
-    test "deletes chosen link", %{conn: conn, link: link} do
-      conn = delete(conn, Routes.link_path(conn, :delete, link))
-      assert response(conn, 204)
+    test "returns shortcode stats with an existing code", %{conn: conn, link: link} do
+      response =
+        conn
+        |> get("/#{link.shortcode}/stats")
+        |> json_response(200)
 
-      assert_error_sent 404, fn ->
-        get(conn, Routes.link_path(conn, :show, link))
-      end
+      assert response["startDate"] == String.replace(DateTime.to_string(link.inserted_at), " ", "T")
+      assert response["lastSeenDate"] == String.replace(DateTime.to_string(link.updated_at), " ", "T")
+      assert response["redirectCount"] == link.redirect_count
+    end
+
+    test "returns 404 if shortcode was not found", %{conn: conn} do
+      response =
+        conn
+        |> get("/an_invalid_shortcode")
+        |> json_response(404)
+
+      assert response["errors"] != %{}
     end
   end
 

@@ -18,14 +18,14 @@ defmodule ShortyWeb.LinkController do
   def show(conn, %{"shortcode" => shortcode}) do
     with link = Links.get_link_by_shortcode(shortcode) do
       case link do
-        nil -> 
-          conn 
+        nil ->
+          conn
           |> put_status(:not_found)
           |> put_view(ShortyWeb.ErrorView)
           |> render(:"404")
-        record -> 
+        record ->
           conn
-          |> put_resp_header("Loaction", record.url)
+          |> put_resp_header("location", record.url)
           |> send_resp(302, "")
         end
     end
@@ -34,12 +34,12 @@ defmodule ShortyWeb.LinkController do
   def stats(conn, %{"shortcode" => shortcode}) do
     with link = Links.get_link_by_shortcode(shortcode) do
       case link do
-        nil -> 
-          conn 
+        nil ->
+          conn
           |> put_status(:not_found)
           |> put_view(ShortyWeb.ErrorView)
           |> render(:"404")
-        record -> 
+        record ->
           conn
           |>render("stats.json", link: record)
         end

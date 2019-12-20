@@ -6,9 +6,9 @@ defmodule Shorty.LinksTest do
   describe "links" do
     alias Shorty.Links.Link
 
-    @valid_attrs %{shortcode: "some shortcode", url: "some url"}
-    @update_attrs %{shortcode: "some updated shortcode", url: "some updated url"}
-    @invalid_attrs %{shortcode: nil, url: nil}
+    @valid_attrs %{shortcode: "Xf24g4", url: "https://www.impraise.com"}
+    @invalid_attrs %{shortcode: "an invalid shortcode", url: "https://www.impraise.com"}
+    @valid_attrs_without_shortcode %{url: "https://www.impraise.com"}
 
     def link_fixture(attrs \\ %{}) do
       {:ok, link} =
@@ -19,48 +19,31 @@ defmodule Shorty.LinksTest do
       link
     end
 
-    test "list_links/0 returns all links" do
-      link = link_fixture()
-      assert Links.list_links() == [link]
-    end
-
-    test "get_link!/1 returns the link with given id" do
-      link = link_fixture()
-      assert Links.get_link!(link.id) == link
-    end
-
-    test "create_link/1 with valid data creates a link" do
+    test "create_link/1 creates a link with valid url and with a shortcode" do
       assert {:ok, %Link{} = link} = Links.create_link(@valid_attrs)
-      assert link.shortcode == "some shortcode"
-      assert link.url == "some url"
+
+      assert link.shortcode == @valid_attrs[:shortcode]
+      assert link.url == @valid_attrs[:url]
     end
 
-    test "create_link/1 with invalid data returns error changeset" do
+    test "create_link/1 creates a link with a valid url and without a shortcode" do
+      assert {:ok, %Link{} = link} = Links.create_link(@valid_attrs_without_shortcode)
+
+      #assert link.shortcode == @valid_attrs_without_shortcode[:shortcode]
+      assert link.url == @valid_attrs_without_shortcode[:url]
+    end
+
+    test "create_link/1 doesnt create a link with an invalid shortcode" do
       assert {:error, %Ecto.Changeset{}} = Links.create_link(@invalid_attrs)
     end
 
-    test "update_link/2 with valid data updates the link" do
-      link = link_fixture()
-      assert {:ok, %Link{} = link} = Links.update_link(link, @update_attrs)
-      assert link.shortcode == "some updated shortcode"
-      assert link.url == "some updated url"
+    test "create_link/1 doesnt create a link without a url" do
+      assert {:error, %Ecto.Changeset{}} = Links.create_link(%{})
     end
 
-    test "update_link/2 with invalid data returns error changeset" do
+    test "get_link_by_shortcode/1 returns the link with given shortcode" do
       link = link_fixture()
-      assert {:error, %Ecto.Changeset{}} = Links.update_link(link, @invalid_attrs)
-      assert link == Links.get_link!(link.id)
-    end
-
-    test "delete_link/1 deletes the link" do
-      link = link_fixture()
-      assert {:ok, %Link{}} = Links.delete_link(link)
-      assert_raise Ecto.NoResultsError, fn -> Links.get_link!(link.id) end
-    end
-
-    test "change_link/1 returns a link changeset" do
-      link = link_fixture()
-      assert %Ecto.Changeset{} = Links.change_link(link)
+      assert Links.get_link_by_shortcode(link.shortcode) == link
     end
   end
 end

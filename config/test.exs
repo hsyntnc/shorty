@@ -1,11 +1,10 @@
 use Mix.Config
 
+database_url = System.get_env("DATABASE_URL") || "postgres://postgres:postgres@localhost:5432/shorty_test"
+
 # Configure your database
 config :shorty, Shorty.Repo,
-  username: "postgres",
-  password: "postgres",
-  database: "shorty_test",
-  hostname: "localhost",
+  url: database_url,
   pool: Ecto.Adapters.SQL.Sandbox
 
 # We don't run a server during test. If one is required,

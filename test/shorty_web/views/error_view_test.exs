@@ -5,11 +5,15 @@ defmodule ShortyWeb.ErrorViewTest do
   import Phoenix.View
 
   test "renders 404.json" do
-    assert render(ShortyWeb.ErrorView, "404.json", []) == %{errors: %{detail: "Not Found"}}
+    assert render(ShortyWeb.ErrorView, "404.json", []) == %{errors: %{detail: "The shortcode cannot be found in the system"}}
   end
 
-  test "renders 500.json" do
-    assert render(ShortyWeb.ErrorView, "500.json", []) ==
-             %{errors: %{detail: "Internal Server Error"}}
+  test "renders 400.json" do
+    assert render(ShortyWeb.ErrorView, "400.json", []) == %{errors: %{detail: "You must provide a url."}}
   end
+
+  test "renders 409.json" do
+    assert render(ShortyWeb.ErrorView, "409.json", []) == %{errors: %{detail: "The the desired shortcode is already in use."}}
+  end
+
 end

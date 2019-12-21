@@ -9,8 +9,7 @@ services:
             - "4000:4000"
         environment:
             - DATABASE_URL=postgres://dbuser:dbpass@db:5432/dbname
-            - SECRET_KEY_BASE=DAK1W1XGgdgkjvgQ/sWzjfC8dIsQ+NWMG9x2uykcCQzhOb6scqDNhr4bPlSvYr4H
-            - MIX_ENV=prod
+            - MIX_ENV=test
         depends_on:
             - db
 

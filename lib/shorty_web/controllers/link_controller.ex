@@ -6,6 +6,7 @@ defmodule ShortyWeb.LinkController do
 
   plug :check_url_existence when action in [:create]
   plug :check_shortcode_uniqueness when action in [:create]
+  plug :set_shortcode when action in [:show, :stats]
 
   action_fallback ShortyWeb.FallbackController
 
@@ -18,24 +19,19 @@ defmodule ShortyWeb.LinkController do
     end
   end
 
-  def show(conn, %{"shortcode" => shortcode}) do
-    with link = Links.get_link_by_shortcode(shortcode) do
-      case link do
-        nil ->
-          conn
-          |> put_status(:not_found)
-          |> put_view(ShortyWeb.ErrorView)
-          |> render(:"404")
-        record ->
-          conn
-          |> put_resp_header("location", record.url)
-          |> send_resp(302, "")
-        end
-    end
+  def show(conn, %{"shortcode" => _shortcode}) do
+    conn
+    |> put_resp_header("location", conn.assigns[:link].url)
+    |> send_resp(302, "")
   end
 
-  def stats(conn, %{"shortcode" => shortcode}) do
-    with link = Links.get_link_by_shortcode(shortcode) do
+  def stats(conn, %{"shortcode" => _shortcode}) do
+    conn
+    |> render("stats.json", link: conn.assigns[:link])
+  end
+
+  defp set_shortcode(conn, _) do
+    with link = Links.get_link_by_shortcode(conn.params["shortcode"]) do
       case link do
         nil ->
           conn
@@ -44,7 +40,7 @@ defmodule ShortyWeb.LinkController do
           |> render(:"404")
         record ->
           conn
-          |>render("stats.json", link: record)
+          |> assign(:link, record)
         end
     end
   end

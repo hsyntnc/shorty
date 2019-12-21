@@ -44,7 +44,7 @@ defmodule Shorty.Links do
       iex> get_link_by_shortcode!("shortcode")
       %Link{}
 
-      iex> get_link_by_shortcode!("anothercode")
+      iex> get_link_by_shortcode("anothercode")
       ** (Ecto.NoResultsError)
   """
   def get_link_by_shortcode(shortcode), do: Repo.get_by(Link, shortcode: shortcode)

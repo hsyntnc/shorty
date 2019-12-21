@@ -52,7 +52,7 @@ defmodule ShortyWeb.LinkController do
   end
 
   def increase_count(link) do
-    with {:ok, %Link{} = link} <- Links.update_link(link, %{url: "https://google.com", redirect_count: link.redirect_count + 1}) do
+    with {:ok, %Link{} = link} <- Links.update_link(link, %{redirect_count: link.redirect_count + 1}) do
       link
     end
   end

@@ -4,6 +4,9 @@ defmodule ShortyWeb.LinkController do
   alias Shorty.Links
   alias Shorty.Links.Link
 
+  plug :check_url_existence when action in [:create]
+  plug :check_shortcode_uniqueness when action in [:create]
+
   action_fallback ShortyWeb.FallbackController
 
   def create(conn, link_params) do
@@ -44,5 +47,32 @@ defmodule ShortyWeb.LinkController do
           |>render("stats.json", link: record)
         end
     end
+  end
+
+  defp check_url_existence(conn, _) do
+    if is_nil(conn.params["url"]) do
+      conn
+      |> put_status(:bad_request)
+      |> put_view(ShortyWeb.ErrorView)
+      |> render("400.json")
+    end
+    conn
+  end
+
+  defp check_shortcode_uniqueness(conn, _) do
+    unless is_nil(conn.params["shortcode"]) do
+      with link = Links.get_link_by_shortcode(conn.params["shortcode"]) do
+        case link do
+          nil ->
+            conn
+          _record ->
+            conn
+            |> put_status(409)
+            |> put_view(ShortyWeb.ErrorView)
+            |> render("409.json")
+          end
+      end
+    end
+    conn
   end
 end

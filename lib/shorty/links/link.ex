@@ -29,6 +29,12 @@ defmodule Shorty.Links.Link do
       changeset
     end
 
+    # I've tried to make it without an if block but could't make it work.
+    # All the advices are welcome for this function.
+    # It says when we call get_field function, it returns the current value or
+    # we can set a default value as a second parameter if its nil on official documentation but didnt work here.
+    # I've spent like an hour here. I'll leave the old code here anyway.
+    #
     # shortcode =
     #  changeset
     #  |> get_field(:shortcode, random_string(6))
@@ -50,7 +56,7 @@ defmodule Shorty.Links.Link do
   end
 
   @doc false
-  def random_string(length) do
+  defp random_string(length) do
     chars =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_1234567890"
       |> String.split("")

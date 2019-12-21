@@ -18,8 +18,13 @@ defmodule ShortyWeb.LinkControllerTest do
     url: "https://www.impraise.com"
   }
 
+  @fixture_attrs %{
+    shortcode: "xxxxxx",
+    url: "https://www.impraise.com"
+  }
+
   def fixture(:link) do
-    {:ok, link} = Links.create_link(@valid_link_attrs)
+    {:ok, link} = Links.create_link(@fixture_attrs)
     link
   end
 
@@ -28,6 +33,8 @@ defmodule ShortyWeb.LinkControllerTest do
   end
 
   describe "shortcode generation" do
+    setup [:create_link]
+
     test "create a shortcode with a valid code given", %{conn: conn} do
       response =
         conn
@@ -44,6 +51,8 @@ defmodule ShortyWeb.LinkControllerTest do
         conn
         |> post("/shorten", @link_without_code)
         |> json_response(201)
+
+      assert Regex.match?( ~r/^[0-9a-zA-Z_]{6}$/, response["shortcode"])
     end
 
     test "returns an error without a url", %{ conn: conn } do
@@ -64,10 +73,13 @@ defmodule ShortyWeb.LinkControllerTest do
       assert response["errors"] != %{}
     end
 
-    test "returns an error if given shortcode is already in use", %{conn: conn} do
+    test "returns an error if given shortcode is already in use", %{conn: conn, link: link} do
       response =
         conn
-        |> post("/shorten", @valid_link_attrs)
+        |> post("/shorten", @fixture_attrs)
+        |> json_response(409)
+
+      assert response["errors"] != %{}
     end
   end
 

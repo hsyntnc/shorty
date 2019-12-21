@@ -30,6 +30,7 @@ defmodule Shorty.LinksTest do
       assert {:ok, %Link{} = link} = Links.create_link(@valid_attrs_without_shortcode)
 
       #assert link.shortcode == @valid_attrs_without_shortcode[:shortcode]
+      assert Regex.match?( ~r/^[0-9a-zA-Z_]{6}$/, link.shortcode)
       assert link.url == @valid_attrs_without_shortcode[:url]
     end
 

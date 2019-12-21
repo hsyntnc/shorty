@@ -10,7 +10,15 @@ defmodule ShortyWeb.ErrorView do
   # By default, Phoenix returns the status message from
   # the template name. For example, "404.json" becomes
   # "Not Found".
-  def template_not_found(template, _assigns) do
+  def template_not_found(_, _assigns) do
     %{errors: %{detail: "The shortcode cannot be found in the system"}}
+  end
+
+  def render("400.json", _assigns) do
+    %{errors: %{detail: "You must provide a url."}}
+  end
+
+  def render("409.json", _assigns) do
+    %{errors: %{detail: "The the desired shortcode is already in use."}}
   end
 end

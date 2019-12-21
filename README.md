@@ -1,19 +1,10 @@
 # Shorty
 
-To start your Phoenix server:
+URL Shortener written with Elixir / Phoenix
 
-  * Install dependencies with `mix deps.get`
-  * Create and migrate your database with `mix ecto.setup`
-  * Start Phoenix endpoint with `mix phx.server`
+  * Create database `docker-compose run app mix ecto.create`
+  * Run migrations `docker-compose run app mix ecto.migrate`
+  * Run application `docker-compose up`
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
-
-## Learn more
-
-  * Official website: http://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Mailing list: http://groups.google.com/group/phoenix-talk
-  * Source: https://github.com/phoenixframework/phoenix
+  * Start Phoenix endpoint with `docker-compose -f docker-compose-test.yml run app mix test`

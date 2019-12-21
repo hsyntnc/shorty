@@ -8,7 +8,7 @@ services:
         ports:
             - "4000:4000"
         environment:
-            - DATABASE_URL=postgres://dbuser:dbpass@db:5432/dbname
+            - DATABASE_URL=postgres://dbuser:dbpass@db:5432/dbname_test
             - MIX_ENV=test
         depends_on:
             - db
@@ -22,5 +22,5 @@ services:
         #   - db:/var/lib/postgresql/data
         environment:
             - POSTGRES_USER=dbuser
-            - POSTGRES_DB=dbname
+            - POSTGRES_DB=dbname_test
             - POSTGRES_PASSWORD=dbpass

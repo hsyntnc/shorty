@@ -20,7 +20,10 @@ defmodule ShortyWeb.LinkController do
   end
 
   def show(conn, %{"shortcode" => _shortcode}) do
-    link = set_shortcode(conn, %{})
+    link =
+      conn
+      |> set_link(%{})
+        |> increase_count
 
     conn
     |> put_resp_header("location", link.url)
@@ -28,13 +31,13 @@ defmodule ShortyWeb.LinkController do
   end
 
   def stats(conn, %{"shortcode" => _shortcode}) do
-    link = set_shortcode(conn, %{})
+    link = set_link(conn, %{})
 
     conn
     |> render("stats.json", link: link)
   end
 
-  defp set_shortcode(conn, _) do
+  defp set_link(conn, _) do
     with link = Links.get_link_by_shortcode(conn.params["shortcode"]) do
       case link do
         nil ->
@@ -45,6 +48,12 @@ defmodule ShortyWeb.LinkController do
         record ->
           record
         end
+    end
+  end
+
+  def increase_count(link) do
+    with {:ok, %Link{} = link} <- Links.update_link(link, %{url: "https://google.com", redirect_count: link.redirect_count + 1}) do
+      link
     end
   end
 

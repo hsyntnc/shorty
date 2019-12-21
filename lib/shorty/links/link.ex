@@ -12,7 +12,7 @@ defmodule Shorty.Links.Link do
   @doc false
   def changeset(link, attrs) do
     link
-    |> cast(attrs, [:shortcode, :url])
+    |> cast(attrs, [:shortcode, :url, :redirect_count])
     |> set_shortcode
     |> validate_required([:shortcode, :url])
     |> validate_shortcode

@@ -6,5 +6,4 @@ URL Shortener written with Elixir / Phoenix
   * Run migrations `docker-compose run app mix ecto.migrate`
   * Run application `docker-compose up`
 
-
-  * Start Phoenix endpoint with `docker-compose -f docker-compose-test.yml run app mix test`
+  * Run tests `docker-compose -f docker-compose-test.yml run app mix test`

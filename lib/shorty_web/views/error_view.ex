@@ -11,6 +11,10 @@ defmodule ShortyWeb.ErrorView do
   # the template name. For example, "404.json" becomes
   # "Not Found".
   def template_not_found(_, _assigns) do
+    %{errors: %{detail: "Internal server error"}}
+  end
+
+  def render("404.json", _ssigns) do
     %{errors: %{detail: "The shortcode cannot be found in the system"}}
   end
 
